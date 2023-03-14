@@ -1,10 +1,11 @@
-package com.liluka.model.dto;
+package com.liluka.persistence.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
 import javax.validation.constraints.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Data
@@ -15,9 +16,8 @@ public class RegistrationUserDTO {
     @NotBlank(message = "ФИО не может быть пустым")
     private String name;
 
-    //TODO -->> make dob validation
-    @NotBlank(message = "Дата рождения не может быть пустой")
-    private String dob;
+    @NotNull(message = "Дата рождения не может быть пустой")
+    private Date dob;
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Введенное значение не является email")

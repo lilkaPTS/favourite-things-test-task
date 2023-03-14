@@ -1,10 +1,9 @@
-package com.liluka.controller;
+package com.liluka.controller.registration;
 
-import com.liluka.model.dto.RegistrationUserDTO;
+import com.liluka.persistence.dto.RegistrationUserDTO;
 import com.liluka.service.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
 @RequiredArgsConstructor
 @Log4j2
-public class RegistrationController {
+@RequestMapping("/api/shared")
+public class SharedController {
 
     private final RegistrationService registrationService;
 
