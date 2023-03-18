@@ -1,7 +1,9 @@
 package com.liluka.controller.registration;
 
+import com.liluka.persistence.dto.LoginDTO;
 import com.liluka.persistence.dto.RegistrationUserDTO;
 import com.liluka.service.RegistrationService;
+import com.liluka.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -17,10 +19,16 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/shared")
-public class SharedController {
+@RequestMapping("/api/public")
+public class PublicController {
 
+    private final AuthorizationService authorizationService;
     private final RegistrationService registrationService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO dto) {
+        return authorizationService.login(dto);
+    }
 
     @PostMapping("/registration")
     public ResponseEntity<String> registration(@Valid @RequestBody RegistrationUserDTO dto) {

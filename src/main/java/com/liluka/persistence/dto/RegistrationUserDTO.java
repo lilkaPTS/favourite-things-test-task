@@ -19,14 +19,14 @@ public class RegistrationUserDTO {
     @NotNull(message = "Дата рождения не может быть пустой")
     private Date dob;
 
-    @NotBlank(message = "Email не может быть пустым")
+    @NotBlank(message = "E-mail не может быть пустым")
     @Email(message = "Введенное значение не является email")
     private String email;
 
-    @NotBlank(message = "Пароль не должен быть пустым")
+    @NotBlank(message = "Пароль не может быть пустым")
     private String password;
 
-    @NotBlank(message = "Повторный пароль не должен быть пустым")
+    @NotBlank(message = "Повторный пароль не может быть пустым")
     private String confirmPassword;
 
     @AssertTrue(message = "Пароли не совпадают")
