@@ -16,11 +16,7 @@ public class ConfirmationCode {
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Column(nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private String code;
 
     public ConfirmationCode(String email, String code) {

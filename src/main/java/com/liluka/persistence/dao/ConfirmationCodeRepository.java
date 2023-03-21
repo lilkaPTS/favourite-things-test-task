@@ -11,12 +11,7 @@ import java.util.Optional;
 
 public interface ConfirmationCodeRepository extends JpaRepository<ConfirmationCode, Long> {
 
-    Optional<ConfirmationCode> findConfirmationCodeByEmail(String email);
-
-    @Query("SELECT case when count(cc)>0 then TRUE else FALSE end FROM ConfirmationCode cc "
-            + "WHERE cc.email = :email")
-    Boolean existByEmail(@Param("email") String email);
-
+    Optional<ConfirmationCode> findByEmail(String email);
 
     @Modifying
     @Transactional

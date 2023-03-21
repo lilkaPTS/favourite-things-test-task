@@ -31,7 +31,7 @@ public class RegistrationService implements IRegistrationService {
     public ResponseEntity<String> createUser(RegistrationUserDTO userDTO) {
         if (isNotActivatedEmail(userDTO.getEmail())) {
             User user = new User(userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getName(), userDTO.getDob(), Role.USER);
-            sendCode(userDTO.getEmail());
+            sendCodeAsync(userDTO.getEmail());
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно создан, код подтверждения отправлен на почту");
         } else {
@@ -42,7 +42,7 @@ public class RegistrationService implements IRegistrationService {
     //TODO dry - переделать на try/catch
     public ResponseEntity<String> sendConfirmationCode(String email) {
         if (isNotActivatedEmail(email)) {
-            sendCode(email);
+            sendCodeAsync(email);
             return ResponseEntity.status(HttpStatus.OK).body("Код подтверждения отправлен");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь с таким e-mail уже существует");
@@ -73,24 +73,23 @@ public class RegistrationService implements IRegistrationService {
         }
     }
 
-    private void sendCode(String email) {
-        Thread thread = new Thread(() -> {
+    private void sendCodeAsync(String email) {
+        new Thread(() -> {
             ConfirmationCode code = new ConfirmationCode(email, generateConfirmationCode());
 
             emailService.sentEmail(code.getEmail(), code.getCode());
-            if (confirmationCodeRepository.existByEmail(email)) {
+            if (confirmationCodeRepository.findByEmail(email).isPresent()) {
                 confirmationCodeRepository.updateCode(code.getEmail(), code.getCode());
             } else {
                 confirmationCodeRepository.save(code);
             }
-        });
-        thread.start();
+        }).start();
     }
 
     private void checkConfirmationCode(ActivateUserDTO dto) {
         RegistrationException exception = new RegistrationException("Неверный код подтверждения", HttpStatus.BAD_REQUEST);
 
-        ConfirmationCode confirmationCode = confirmationCodeRepository.findConfirmationCodeByEmail(dto.getEmail()).orElseThrow(() -> exception);
+        ConfirmationCode confirmationCode = confirmationCodeRepository.findByEmail(dto.getEmail()).orElseThrow(() -> exception);
         if (!Objects.equals(confirmationCode.getCode(), dto.getCode())) throw exception;
     }
 
