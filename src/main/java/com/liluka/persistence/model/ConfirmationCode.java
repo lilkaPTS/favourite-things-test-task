@@ -16,11 +16,14 @@ public class ConfirmationCode {
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String email;
-    private String code;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "user_id", foreignKey = @ForeignKey(name = "FK_VERIFY_USER"))
+    private User user;
+    private String token;
 
-    public ConfirmationCode(String email, String code) {
-        this.email = email;
-        this.code = code;
+
+    public ConfirmationCode(User user, String token) {
+        this.user = user;
+        this.token = token;
     }
 }

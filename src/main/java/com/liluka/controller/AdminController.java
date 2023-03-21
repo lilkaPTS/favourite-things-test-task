@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin")
+@RequestMapping("${admin-controller.path}")
 public class AdminController {
 
     private final UserRepository userRepository;

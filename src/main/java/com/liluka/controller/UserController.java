@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("${user-controller.path}")
 public class UserController {
 
     @PreAuthorize("hasAnyAuthority('USER_PERMISSION')")

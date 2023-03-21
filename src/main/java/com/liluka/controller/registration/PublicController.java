@@ -1,5 +1,6 @@
 package com.liluka.controller.registration;
 
+import com.liluka.persistence.dao.ConfirmationCodeRepository;
 import com.liluka.persistence.dto.ActivateUserDTO;
 import com.liluka.persistence.dto.LoginDTO;
 import com.liluka.persistence.dto.RegistrationUserDTO;
@@ -23,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/public")
+@RequestMapping("${public-controller.path}")
 @Validated
 public class PublicController {
 
@@ -48,8 +49,8 @@ public class PublicController {
     }
 
     @GetMapping("/activate")
-    public ResponseEntity<String> activateUser(ActivateUserDTO dto) {
-        return registrationService.activateUser(dto);
+    public ResponseEntity<String> activateUser(@NotBlank(message = "Код не может быть пустым") String token) {
+        return registrationService.activateUser(token);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

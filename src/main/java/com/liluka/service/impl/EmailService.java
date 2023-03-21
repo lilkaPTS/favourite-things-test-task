@@ -15,7 +15,7 @@ public class EmailService {
         emailSender.setPort(465);
 
         emailSender.setUsername("lilspringboot@yahoo.com");
-        emailSender.setPassword("jjoqxajhwrssjeqz");
+        emailSender.setPassword("");
 
         Properties props = emailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

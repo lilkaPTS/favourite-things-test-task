@@ -1,7 +1,6 @@
 package com.liluka.persistence.model;
 
 import com.liluka.enums.Role;
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

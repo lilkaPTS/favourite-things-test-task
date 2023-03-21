@@ -3,7 +3,6 @@ package com.liluka.service.impl;
 import com.liluka.enums.Role;
 import com.liluka.exeption.RegistrationException;
 import com.liluka.persistence.dao.ConfirmationCodeRepository;
-import com.liluka.persistence.dto.ActivateUserDTO;
 import com.liluka.persistence.model.ConfirmationCode;
 import com.liluka.persistence.model.User;
 import com.liluka.persistence.dto.RegistrationUserDTO;
@@ -15,8 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,34 +26,37 @@ public class RegistrationService implements IRegistrationService {
     private final EmailService emailService;
     private final ConfirmationCodeRepository confirmationCodeRepository;
 
-    //TODO dry - переделать на try/catch. Пофиксить двойное добавление пользователя (исправить isNotActivatedEmail)
     public ResponseEntity<String> createUser(RegistrationUserDTO userDTO) {
-        if (isNotActivatedEmail(userDTO.getEmail())) {
-            User user = new User(userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getName(), userDTO.getDob(), Role.USER);
-            sendCodeAsync(userDTO.getEmail());
-            userRepository.save(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно создан, код подтверждения отправлен на почту");
-        } else {
+        Optional<User> foundUser = userRepository.findByEmail(userDTO.getEmail());
+        if (foundUser.isPresent() && foundUser.get().isEnabled()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь с таким e-mail уже существует");
-        }
+        } else foundUser.ifPresent(user -> {
+            confirmationCodeRepository.deleteByUser(user);
+            userRepository.delete(user);
+        });
+
+        User user = new User(userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getName(), userDTO.getDob(), Role.USER);
+        userRepository.save(user);
+        sendCodeAsync(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно создан, код подтверждения отправлен на почту");
     }
 
-    //TODO dry - переделать на try/catch
     public ResponseEntity<String> sendConfirmationCode(String email) {
-        if (isNotActivatedEmail(email)) {
-            sendCodeAsync(email);
-            return ResponseEntity.status(HttpStatus.OK).body("Код подтверждения отправлен");
-        } else {
+        Optional<User> foundUser = userRepository.findByEmail(email);
+        if (foundUser.isEmpty() || foundUser.get().isEnabled()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь с таким e-mail уже существует");
+        } else {
+            sendCodeAsync(foundUser.get());
+            return ResponseEntity.status(HttpStatus.OK).body("Код подтверждения отправлен");
         }
     }
 
-    public ResponseEntity<String> activateUser(ActivateUserDTO dto) {
+    public ResponseEntity<String> activateUser(String token) {
         try {
-            checkConfirmationCode(dto);
+            ConfirmationCode confirmationCode = confirmationCodeRepository.findByToken(token).orElseThrow(() ->
+                    new RegistrationException("Неверный код подтверждения", HttpStatus.BAD_REQUEST));
 
-            User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
-                    new RegistrationException(String.format("Пользователь %s не найден ", dto.getEmail()), HttpStatus.NOT_FOUND));
+            User user = confirmationCode.getUser();
             user.setEnabled(true);
             userRepository.save(user);
 
@@ -64,41 +66,16 @@ public class RegistrationService implements IRegistrationService {
         }
     }
 
-    private boolean isNotActivatedEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            return !user.get().isEnabled();
-        } else {
-            return true;
-        }
-    }
-
-    private void sendCodeAsync(String email) {
+    private void sendCodeAsync(User user) {
         new Thread(() -> {
-            ConfirmationCode code = new ConfirmationCode(email, generateConfirmationCode());
+            String token = UUID.randomUUID().toString();
 
-            emailService.sentEmail(code.getEmail(), code.getCode());
-            if (confirmationCodeRepository.findByEmail(email).isPresent()) {
-                confirmationCodeRepository.updateCode(code.getEmail(), code.getCode());
-            } else {
-                confirmationCodeRepository.save(code);
-            }
+            ConfirmationCode confirmationCode = confirmationCodeRepository.findByUser(user).orElse(new ConfirmationCode(user, token));
+            confirmationCode.setToken(token);
+            confirmationCodeRepository.save(confirmationCode);
+
+            String message = "http://localhost:8080/api/public/activate?token=" + token;
+            emailService.sentEmail(user.getEmail(), message);
         }).start();
-    }
-
-    private void checkConfirmationCode(ActivateUserDTO dto) {
-        RegistrationException exception = new RegistrationException("Неверный код подтверждения", HttpStatus.BAD_REQUEST);
-
-        ConfirmationCode confirmationCode = confirmationCodeRepository.findByEmail(dto.getEmail()).orElseThrow(() -> exception);
-        if (!Objects.equals(confirmationCode.getCode(), dto.getCode())) throw exception;
-    }
-
-    private String generateConfirmationCode() {
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            int number = (int) (Math.random() * 10);
-            code.append(number % 2 == 0 ? String.valueOf((char) ((Math.random() * 26) + 65)) : String.valueOf(number));
-        }
-        return code.toString();
     }
 }
