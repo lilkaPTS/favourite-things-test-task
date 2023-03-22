@@ -2,7 +2,6 @@ package com.liluka.persistence.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.extern.log4j.Log4j2;
 
 import javax.validation.constraints.*;
 import java.util.Date;
@@ -10,7 +9,6 @@ import java.util.Objects;
 
 @Data
 @AllArgsConstructor
-@Log4j2
 public class RegistrationUserDTO {
 
     @NotBlank(message = "ФИО не может быть пустым")

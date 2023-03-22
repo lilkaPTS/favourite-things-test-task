@@ -1,16 +1,18 @@
 package com.liluka.persistence.model;
 
 import com.liluka.enums.Role;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -25,6 +27,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Role role;
     private boolean enabled;
+
+    @OneToMany(targetEntity = LogEntry.class, fetch = FetchType.LAZY)
+    private List<LogEntry> logEntries;
 
     public User(String email, String password, String name, Date dob, Role role) {
         this.email = email;
