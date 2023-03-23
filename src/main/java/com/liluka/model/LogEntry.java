@@ -1,4 +1,4 @@
-package com.liluka.persistence.model;
+package com.liluka.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,13 +14,12 @@ import java.util.Date;
 public class LogEntry {
 
     @Id
-    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
     @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_LOG_ENTRY_USER"))
+    @JoinColumn(name = "user_id")
     private User user;
     private String endpoint;
     @Enumerated(value = EnumType.STRING)

@@ -1,6 +1,6 @@
 package com.liluka.controller.advice.logging;
 
-import com.liluka.service.impl.LoggingService;
+import com.liluka.service.api.LoggingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

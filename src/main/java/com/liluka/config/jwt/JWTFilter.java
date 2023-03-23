@@ -1,6 +1,6 @@
 package com.liluka.config.jwt;
 
-import com.liluka.exeption.JWTAuthenticationException;
+import com.liluka.exception.JWTAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

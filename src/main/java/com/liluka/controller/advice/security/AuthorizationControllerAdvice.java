@@ -19,5 +19,4 @@ public class AuthorizationControllerAdvice {
     public final ResponseEntity<String> handleAuthenticationCredentialsNotFoundException() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Данное действие требует авторизации");
     }
-
 }

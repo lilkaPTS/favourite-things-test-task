@@ -1,7 +1,7 @@
 package com.liluka.service.security;
 
-import com.liluka.persistence.dao.UserRepository;
-import com.liluka.persistence.model.User;
+import com.liluka.repository.UserRepository;
+import com.liluka.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,12 +14,6 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    /**
-     *
-     * @param email - уникальный идентификатор пользователя
-     * @return UserDetails объект идентификации пользователя
-     * @throws UsernameNotFoundException
-     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String.format("Пользователь %s не найден ", email)));

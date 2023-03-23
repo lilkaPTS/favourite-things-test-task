@@ -1,6 +1,6 @@
-package com.liluka.persistence.dao;
+package com.liluka.repository;
 
-import com.liluka.persistence.model.User;
+import com.liluka.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

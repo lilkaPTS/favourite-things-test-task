@@ -1,10 +1,9 @@
-package com.liluka.persistence.dao;
+package com.liluka.repository;
 
-import com.liluka.persistence.model.ConfirmationCode;
-import com.liluka.persistence.model.User;
+import com.liluka.model.ConfirmationCode;
+import com.liluka.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface ConfirmationCodeRepository extends JpaRepository<ConfirmationCode, Long> {
@@ -13,6 +12,5 @@ public interface ConfirmationCodeRepository extends JpaRepository<ConfirmationCo
 
     Optional<ConfirmationCode> findByToken(String token);
 
-    @Transactional
     void deleteByUser(User user);
 }

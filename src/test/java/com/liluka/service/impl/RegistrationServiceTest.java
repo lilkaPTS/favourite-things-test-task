@@ -2,10 +2,10 @@ package com.liluka.service.impl;
 
 
 import com.liluka.enums.Role;
-import com.liluka.persistence.dao.ConfirmationCodeRepository;
-import com.liluka.persistence.dao.UserRepository;
-import com.liluka.persistence.dto.RegistrationUserDTO;
-import com.liluka.persistence.model.User;
+import com.liluka.repository.ConfirmationCodeRepository;
+import com.liluka.repository.UserRepository;
+import com.liluka.dto.RegistrationUserDTO;
+import com.liluka.model.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,16 +40,13 @@ public class RegistrationServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private EmailService emailService;
-
-    @Mock
     private ConfirmationCodeRepository confirmationCodeRepository;
 
     @Mock
     private UserRepository userRepository;
 
     @InjectMocks
-    private RegistrationService registrationService;
+    private RegistrationServiceImpl registrationService;
 
     @Test
     public void createUserIfUserNotFound() {

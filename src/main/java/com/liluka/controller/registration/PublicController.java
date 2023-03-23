@@ -1,35 +1,28 @@
 package com.liluka.controller.registration;
 
-import com.liluka.persistence.dao.ConfirmationCodeRepository;
-import com.liluka.persistence.dto.ActivateUserDTO;
-import com.liluka.persistence.dto.LoginDTO;
-import com.liluka.persistence.dto.RegistrationUserDTO;
-import com.liluka.service.api.IAuthorizationService;
-import com.liluka.service.api.IRegistrationService;
+import com.liluka.dto.LoginDTO;
+import com.liluka.dto.RegistrationUserDTO;
+import com.liluka.service.api.AuthorizationService;
+import com.liluka.service.api.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("${public-controller.path}")
+@RequestMapping("/api/public")
 @Validated
 public class PublicController {
 
-    private final IAuthorizationService authorizationService;
-    private final IRegistrationService registrationService;
+    private final AuthorizationService authorizationService;
+    private final RegistrationService registrationService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO dto) {
@@ -51,18 +44,5 @@ public class PublicController {
     @GetMapping("/activate")
     public ResponseEntity<String> activateUser(@NotBlank(message = "Код не может быть пустым") String token) {
         return registrationService.activateUser(token);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        log.info(errors);
-        return errors;
     }
 }

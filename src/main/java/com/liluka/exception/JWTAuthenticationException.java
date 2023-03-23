@@ -1,4 +1,4 @@
-package com.liluka.exeption;
+package com.liluka.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

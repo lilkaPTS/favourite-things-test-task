@@ -1,4 +1,4 @@
-package com.liluka.persistence.dto;
+package com.liluka.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +15,7 @@ public class RegistrationUserDTO {
     private String name;
 
     @NotNull(message = "Дата рождения не может быть пустой")
+    //TODO форматировать даты
     private Date dob;
 
     @NotBlank(message = "E-mail не может быть пустым")

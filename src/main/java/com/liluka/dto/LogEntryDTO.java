@@ -1,4 +1,4 @@
-package com.liluka.persistence.dto;
+package com.liluka.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

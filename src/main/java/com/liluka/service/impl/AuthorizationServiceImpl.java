@@ -1,12 +1,11 @@
 package com.liluka.service.impl;
 
 import com.liluka.config.jwt.JWTProvider;
-import com.liluka.persistence.dao.UserRepository;
-import com.liluka.persistence.dto.LoginDTO;
-import com.liluka.persistence.model.User;
-import com.liluka.service.api.IAuthorizationService;
+import com.liluka.repository.UserRepository;
+import com.liluka.dto.LoginDTO;
+import com.liluka.model.User;
+import com.liluka.service.api.AuthorizationService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +19,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class AuthorizationService implements IAuthorizationService {
+public class AuthorizationServiceImpl implements AuthorizationService {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;

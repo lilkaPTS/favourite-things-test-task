@@ -1,4 +1,4 @@
-package com.liluka.persistence.model;
+package com.liluka.model;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -13,10 +13,9 @@ import javax.persistence.*;
 public class ConfirmationCode {
 
     @Id
-    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id", foreignKey = @ForeignKey(name = "FK_VERIFY_USER"))
     private User user;
     private String token;

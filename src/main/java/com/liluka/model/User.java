@@ -1,4 +1,4 @@
-package com.liluka.persistence.model;
+package com.liluka.model;
 
 import com.liluka.enums.Role;
 import lombok.AccessLevel;
@@ -16,7 +16,6 @@ import java.util.List;
 public class User {
 
     @Id
-    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String email;
@@ -28,7 +27,7 @@ public class User {
     private Role role;
     private boolean enabled;
 
-    @OneToMany(targetEntity = LogEntry.class, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user")
     private List<LogEntry> logEntries;
 
     public User(String email, String password, String name, Date dob, Role role) {

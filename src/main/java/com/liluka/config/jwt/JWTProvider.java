@@ -1,6 +1,6 @@
 package com.liluka.config.jwt;
 
-import com.liluka.exeption.JWTAuthenticationException;
+import com.liluka.exception.JWTAuthenticationException;
 import com.liluka.service.security.UserService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
@@ -22,17 +21,9 @@ public class JWTProvider {
 
     private final UserService userDetailsService;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-    @Value("${jwt.header}")
-    private String authorizationHeader;
-    @Value("${jwt.expiration}")
-    private long validityInMilliseconds;
-
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }
+    private final String secretKey = Base64.getEncoder().encodeToString("lilgud".getBytes());
+    private final String authorizationHeader = "Authorization";
+    private final long validityInMilliseconds = 86400L;
 
     public String createToken(String username, String role) {
         Claims claims = Jwts.claims().setSubject(username);

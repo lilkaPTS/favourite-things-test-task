@@ -1,6 +1,6 @@
-package com.liluka.persistence.dao;
+package com.liluka.repository;
 
-import com.liluka.persistence.model.LogEntry;
+import com.liluka.model.LogEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LogEntryRepository extends JpaRepository<LogEntry, Long> {

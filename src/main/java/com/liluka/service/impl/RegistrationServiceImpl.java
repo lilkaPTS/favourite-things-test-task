@@ -1,25 +1,28 @@
 package com.liluka.service.impl;
 
 import com.liluka.enums.Role;
-import com.liluka.exeption.RegistrationException;
-import com.liluka.persistence.dao.ConfirmationCodeRepository;
-import com.liluka.persistence.model.ConfirmationCode;
-import com.liluka.persistence.model.User;
-import com.liluka.persistence.dto.RegistrationUserDTO;
-import com.liluka.persistence.dao.UserRepository;
-import com.liluka.service.api.IRegistrationService;
+import com.liluka.exception.RegistrationException;
+import com.liluka.repository.ConfirmationCodeRepository;
+import com.liluka.model.ConfirmationCode;
+import com.liluka.model.User;
+import com.liluka.dto.RegistrationUserDTO;
+import com.liluka.repository.UserRepository;
+import com.liluka.service.api.EmailService;
+import com.liluka.service.api.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class RegistrationService implements IRegistrationService {
+@Transactional
+public class RegistrationServiceImpl implements RegistrationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -67,15 +70,14 @@ public class RegistrationService implements IRegistrationService {
     }
 
     private void sendCodeAsync(User user) {
-        new Thread(() -> {
-            String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
 
-            ConfirmationCode confirmationCode = confirmationCodeRepository.findByUser(user).orElse(new ConfirmationCode(user, token));
-            confirmationCode.setToken(token);
-            confirmationCodeRepository.save(confirmationCode);
+        ConfirmationCode confirmationCode = confirmationCodeRepository.findByUser(user).orElse(new ConfirmationCode(user, token));
+        confirmationCode.setToken(token);
+        confirmationCodeRepository.save(confirmationCode);
 
-            String message = "http://localhost:8080/api/public/activate?token=" + token;
-            emailService.sentEmail(user.getEmail(), message);
-        }).start();
+        String message = "http://localhost:8080/api/public/activate?token=" + token;
+
+        emailService.send(user.getEmail(), message, "Confirmation code");
     }
 }
