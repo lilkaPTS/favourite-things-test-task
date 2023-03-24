@@ -19,7 +19,7 @@ public class LogEntry {
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_LOG_USER"))
     private User user;
     private String endpoint;
     @Enumerated(value = EnumType.STRING)

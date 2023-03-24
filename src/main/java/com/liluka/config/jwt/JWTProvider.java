@@ -1,10 +1,9 @@
 package com.liluka.config.jwt;
 
 import com.liluka.exception.JWTAuthenticationException;
-import com.liluka.service.security.UserService;
+import com.liluka.service.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,7 +18,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JWTProvider {
 
-    private final UserService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     private final String secretKey = Base64.getEncoder().encodeToString("lilgud".getBytes());
     private final String authorizationHeader = "Authorization";
@@ -44,7 +43,7 @@ public class JWTProvider {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JWTAuthenticationException("JWT-токен недействителен", HttpStatus.UNAUTHORIZED);
+            throw new JWTAuthenticationException("JWT-токен недействителен");
         }
     }
 

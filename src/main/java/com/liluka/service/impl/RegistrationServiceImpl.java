@@ -10,8 +10,6 @@ import com.liluka.repository.UserRepository;
 import com.liluka.service.api.EmailService;
 import com.liluka.service.api.RegistrationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +27,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final EmailService emailService;
     private final ConfirmationCodeRepository confirmationCodeRepository;
 
-    public ResponseEntity<String> createUser(RegistrationUserDTO userDTO) {
+    public User createUser(RegistrationUserDTO userDTO) throws RegistrationException {
         Optional<User> foundUser = userRepository.findByEmail(userDTO.getEmail());
         if (foundUser.isPresent() && foundUser.get().isEnabled()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь с таким e-mail уже существует");
+            throw new RegistrationException("Пользователь с таким e-mail уже существует");
         } else foundUser.ifPresent(user -> {
             confirmationCodeRepository.deleteByUser(user);
             userRepository.delete(user);
@@ -41,32 +39,28 @@ public class RegistrationServiceImpl implements RegistrationService {
         User user = new User(userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getName(), userDTO.getDob(), Role.USER);
         userRepository.save(user);
         sendCodeAsync(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно создан, код подтверждения отправлен на почту");
+        return user;
     }
 
-    public ResponseEntity<String> sendConfirmationCode(String email) {
+    public boolean sendConfirmationCode(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isEmpty() || foundUser.get().isEnabled()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Пользователь с таким e-mail уже существует");
+            return false;
         } else {
             sendCodeAsync(foundUser.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Код подтверждения отправлен");
+            return true;
         }
     }
 
-    public ResponseEntity<String> activateUser(String token) {
-        try {
-            ConfirmationCode confirmationCode = confirmationCodeRepository.findByToken(token).orElseThrow(() ->
-                    new RegistrationException("Неверный код подтверждения", HttpStatus.BAD_REQUEST));
+    public ConfirmationCode activateUser(String token) throws RegistrationException {
+        ConfirmationCode confirmationCode = confirmationCodeRepository.findByToken(token)
+                .orElseThrow(() -> new RegistrationException("Неверный код подтверждения"));
 
-            User user = confirmationCode.getUser();
-            user.setEnabled(true);
-            userRepository.save(user);
+        User user = confirmationCode.getUser();
+        user.setEnabled(true);
+        userRepository.save(user);
 
-            return ResponseEntity.ok("Пользователь активирован");
-        } catch (RegistrationException ex) {
-            return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
-        }
+        return confirmationCode;
     }
 
     private void sendCodeAsync(User user) {

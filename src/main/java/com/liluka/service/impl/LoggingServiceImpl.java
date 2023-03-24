@@ -7,6 +7,7 @@ import com.liluka.repository.UserRepository;
 import com.liluka.model.LogEntry;
 import com.liluka.model.User;
 import com.liluka.service.api.LoggingService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +34,14 @@ public class LoggingServiceImpl implements LoggingService {
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
 
         String token = request.getHeaders().getFirst("Authorization");
-        User user = StringUtils.isNotBlank(token) ? userRepository.findByEmail(jwtProvider.getUsername(token)).orElse(null) : null;
+
+        User user;
+        try {
+            user = StringUtils.isNotBlank(token) ? userRepository.findByEmail(jwtProvider.getUsername(token)).orElse(null) : null;
+        } catch (ExpiredJwtException ex) {
+            log.info(ex.getMessage());
+            user = null;
+        }
 
         LogEntry logEntry = new LogEntry(user, request.getURI().toString(), HttpStatus.valueOf(servletResponse.getStatus()));
 

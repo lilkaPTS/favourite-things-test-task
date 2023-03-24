@@ -2,10 +2,12 @@ package com.liluka.service.impl;
 
 
 import com.liluka.enums.Role;
+import com.liluka.exception.RegistrationException;
 import com.liluka.repository.ConfirmationCodeRepository;
 import com.liluka.repository.UserRepository;
 import com.liluka.dto.RegistrationUserDTO;
 import com.liluka.model.User;
+import com.liluka.service.api.EmailService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +28,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class RegistrationServiceTest {
 
-    public RegistrationServiceTest() throws ParseException {}
+    public RegistrationServiceTest() throws ParseException {
+    }
 
     private final RegistrationUserDTO userDTO = new RegistrationUserDTO(
             "Гудима Илья Алексеевич",
@@ -36,11 +39,16 @@ public class RegistrationServiceTest {
             "123321"
     );
 
+    private final User user = new User("", "", "", new Date(), Role.USER);
+
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
     private ConfirmationCodeRepository confirmationCodeRepository;
+
+    @Mock
+    private EmailService emailService;
 
     @Mock
     private UserRepository userRepository;
@@ -49,44 +57,40 @@ public class RegistrationServiceTest {
     private RegistrationServiceImpl registrationService;
 
     @Test
-    public void createUserIfUserNotFound() {
+    public void createUserIfUserNotFound() throws RegistrationException {
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
-        Assertions.assertEquals(HttpStatus.CREATED, registrationService.createUser(userDTO).getStatusCode());
+        registrationService.createUser(userDTO);
     }
 
     @Test
-    public void createUserIfUserFoundButNotEnabled() {
-        User user = new User("", "", "", new Date(), Role.USER);
+    public void createUserIfUserFoundButNotEnabled() throws RegistrationException {
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
-        Assertions.assertEquals(HttpStatus.CREATED, registrationService.createUser(userDTO).getStatusCode());
+        registrationService.createUser(userDTO);
     }
 
     @Test
     public void createUserIfUserFoundAndEnabled() {
-        User user = new User("", "", "", new Date(), Role.USER);
         user.setEnabled(true);
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, registrationService.createUser(userDTO).getStatusCode());
+        Assertions.assertThrows(RegistrationException.class, () -> registrationService.createUser(userDTO));
     }
 
     @Test
     public void sendConfirmationCodeIfUserNotFound() {
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, registrationService.sendConfirmationCode("").getStatusCode());
+        Assertions.assertFalse(registrationService.sendConfirmationCode(""));
     }
 
     @Test
     public void sendConfirmationCodeIfUserFoundButNotEnabled() {
-        User user = new User("", "", "", new Date(), Role.USER);
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
-        Assertions.assertEquals(HttpStatus.OK, registrationService.sendConfirmationCode("").getStatusCode());
+        Assertions.assertTrue(registrationService.sendConfirmationCode(""));
     }
 
     @Test
     public void sendConfirmationCodeIfUserFoundAndEnabled() {
-        User user = new User("", "", "", new Date(), Role.USER);
         user.setEnabled(true);
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, registrationService.sendConfirmationCode("").getStatusCode());
+        Assertions.assertFalse(registrationService.sendConfirmationCode(""));
     }
 }
