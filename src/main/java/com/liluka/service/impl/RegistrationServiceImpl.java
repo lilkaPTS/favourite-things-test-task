@@ -10,6 +10,7 @@ import com.liluka.repository.UserRepository;
 import com.liluka.service.api.EmailService;
 import com.liluka.service.api.RegistrationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class RegistrationServiceImpl implements RegistrationService {
+
+    @Value("${server.port}")
+    private String port;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -70,7 +74,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         confirmationCode.setToken(token);
         confirmationCodeRepository.save(confirmationCode);
 
-        String message = "http://localhost:8080/api/public/activate?token=" + token;
+        String message = String.format("http://localhost:%s/api/public/activate?token=%s", port, token);
 
         emailService.send(user.getEmail(), message, "Confirmation code");
     }
