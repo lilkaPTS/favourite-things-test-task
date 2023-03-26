@@ -303,7 +303,7 @@
           },
           "dob": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "email": {
             "type": "string"
