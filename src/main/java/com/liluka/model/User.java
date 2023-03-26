@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -20,8 +20,7 @@ public class User {
     private String email;
     private String password;
     private String name;
-    @Temporal(TemporalType.DATE)
-    private Date dob;
+    private LocalDate dob;
     @Enumerated(value = EnumType.STRING)
     private Role role;
     private boolean enabled;
@@ -29,7 +28,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<LogEntry> logEntries;
 
-    public User(String email, String password, String name, Date dob, Role role) {
+    public User(String email, String password, String name, LocalDate dob, Role role) {
         this.email = email;
         this.password = password;
         this.name = name;

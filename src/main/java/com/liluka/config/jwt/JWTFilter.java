@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
@@ -38,6 +39,7 @@ public class JWTFilter extends GenericFilterBean {
             }
         } catch (JWTAuthenticationException | UsernameNotFoundException ex) {
             log.info(ex.getMessage());
+            ((HttpServletResponse) servletResponse).sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
             SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(servletRequest, servletResponse);

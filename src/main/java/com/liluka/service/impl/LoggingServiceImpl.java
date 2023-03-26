@@ -7,7 +7,6 @@ import com.liluka.repository.UserRepository;
 import com.liluka.model.LogEntry;
 import com.liluka.model.User;
 import com.liluka.service.api.LoggingService;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -33,14 +32,14 @@ public class LoggingServiceImpl implements LoggingService {
     public void logInteraction(ServerHttpRequest request, ServerHttpResponse response) {
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
 
-        String token = request.getHeaders().getFirst("Authorization");
-
-        User user;
+        User user = null;
         try {
-            user = StringUtils.isNotBlank(token) ? userRepository.findByEmail(jwtProvider.getUsername(token)).orElse(null) : null;
-        } catch (ExpiredJwtException ex) {
-            log.info(ex.getMessage());
-            user = null;
+            String token = request.getHeaders().getFirst("Authorization");
+            if (StringUtils.isNotBlank(token))
+                user = userRepository.findByEmailOrElseThrow(jwtProvider.getUsername(token));
+        } catch (Exception ignored) {
+            //Это наверно первый раз в жизни, когда я решил игнорировать ошибку. В данном месте я считаю это уместным, тк
+            // мы предполагаем, что запрос может быть не авторизован (public API), поэтому было бы странно логировать подобное
         }
 
         LogEntry logEntry = new LogEntry(user, request.getURI().toString(), HttpStatus.valueOf(servletResponse.getStatus()));

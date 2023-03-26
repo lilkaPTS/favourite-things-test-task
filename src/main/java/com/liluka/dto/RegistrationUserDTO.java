@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Data
@@ -15,8 +15,8 @@ public class RegistrationUserDTO {
     private String name;
 
     @NotNull(message = "Дата рождения не может быть пустой")
-    //TODO форматировать даты
-    private Date dob;
+    @Past(message = "Дата должна быть в прошлом")
+    private LocalDate dob;
 
     @NotBlank(message = "E-mail не может быть пустым")
     @Email(message = "Введенное значение не является email")

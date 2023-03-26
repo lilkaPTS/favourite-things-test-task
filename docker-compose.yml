@@ -15,6 +15,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4167004
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - TZ=Europe/Moscow
 
   db:
     image: 'postgres:13.1-alpine'

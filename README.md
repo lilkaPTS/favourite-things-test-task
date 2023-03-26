@@ -23,7 +23,7 @@
 ### Запуск:
 
 1. mvn clean install
-2. docker-compose.yml up -d
+2. docker-compose up
 
 # **Документация для работы с API:**
 

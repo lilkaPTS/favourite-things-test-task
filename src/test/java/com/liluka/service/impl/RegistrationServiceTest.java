@@ -1,6 +1,5 @@
 package com.liluka.service.impl;
 
-
 import com.liluka.enums.Role;
 import com.liluka.exception.RegistrationException;
 import com.liluka.repository.ConfirmationCodeRepository;
@@ -17,9 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -27,18 +24,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class RegistrationServiceTest {
 
-    public RegistrationServiceTest() throws ParseException {
-    }
-
     private final RegistrationUserDTO userDTO = new RegistrationUserDTO(
             "Гудима Илья Алексеевич",
-            new SimpleDateFormat("yyyy-MM-dd").parse("2000-07-20"),
+            LocalDate.of(2000,7,20),
             "lilgud@mail.ru",
             "123321",
             "123321"
     );
 
-    private final User user = new User("", "", "", new Date(), Role.USER);
+    private final User user = new User("", "", "", LocalDate.now(), Role.USER);
 
     @Mock
     private PasswordEncoder passwordEncoder;

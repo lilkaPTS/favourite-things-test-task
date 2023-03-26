@@ -9,7 +9,6 @@ import com.liluka.repository.UserRepository;
 import com.liluka.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public FavouriteThingsEntry createFavouriteThingsEntry(FavouriteThingsEntryDTO dto, String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String.format("Пользователь %s не найден ", email)));
+        User user = userRepository.findByEmailOrElseThrow(email);
         Optional<FavouriteThingsEntry> favouriteThingsEntryOptional = favouriteThingsEntryRepository.findByUser(user);
 
         FavouriteThingsEntry favouriteThingsEntry;
